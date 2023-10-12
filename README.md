@@ -9,6 +9,10 @@ Features:
 * Fault-tolerance
 * High availability and scalability
 
+## Dependencies 
+* Boost.asio
+* [JSON for Modern C++](https://github.com/nlohmann/json)
+
 ## Examples
 
 There are some examples to show you the idea how to use Pipashan.
