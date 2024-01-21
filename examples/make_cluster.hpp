@@ -1,6 +1,6 @@
 
 /**
- * This is a simple example to illustrate to create a consensus cluster
+ * This is a simple example to illustrate to create a consensus cluster in a single process
  */
 
 #include <pipashan/node.hpp>
@@ -82,26 +82,20 @@ namespace make_cluster {
 		//The node is configured, now start the service
 		node.start();
 
-		//Create a consensus instance.
+		//Create a consensus instance. This consensus cluster will have 3 nodes.
 		auto demo = node.create_paxos("demo", 3);
 
-		//Insert a node whose identity is "second-node" for consensus.
+		//Previously registers other 2 nodes for the cluster for consensus "demo".
 		demo->insert("second-node");
 		demo->insert("third-node");
+		//It's unnesseray. If we don't register previously, the consensus node will
+		//automatically invite other 2 nodes when they are connected to the cluster.
 
-		//Propose to increase the value.
-		//if(!demo->propose("+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"))
-		//	std::cout<<"First proposal is failed"<<std::endl;
-
-		//std::this_thread::sleep_for(std::chrono::seconds{ 10 });
 
 		//Specified the first-node's address.
 		const pipashan::node::address addr{ "127.0.0.1", "", 1000 };
 
-		/////////////////////////////////////////////////////////
-		//Let's start the second node,
-		/////////////////////////////////////////////////////////
-
+		//Let's create the second node,
 		//Create a node instance with the specified identity "second-node"
 		pipashan::node node2{ "second-node", 	//Identity of this node
 							{addr},			//Specifies the first-node's address,
@@ -116,7 +110,7 @@ namespace make_cluster {
 		node2.start();
 
 
-		//node3
+		//Let's create the third node,
 		//Create a node instance with the specified identity "second-node"
 		pipashan::node node3{ "third-node", 	//Identity of this node
 							{addr},			//Specifies the first-node's address,
@@ -141,9 +135,7 @@ namespace make_cluster {
 		while (d3 && !d3->ready())
 			std::this_thread::sleep_for(std::chrono::seconds{ 1 });
 
-		demo->propose("+");
-
-		return true;
+		return demo->propose("+");
 	} catch(...) {
 		return false;
 	}

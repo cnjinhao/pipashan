@@ -44,7 +44,7 @@ The pointer `cons` points to a consensus instance which is maintained by pipasha
 
 ### Consensus Factory
 
-The consensus factory is assigned to the pipashan node for creating the consensus instance. The key task of consensus factory is to define a adapter.
+The consensus factory is assigned to the pipashan node for creating the consensus instance. The key task of consensus factory is to define an adapter.
 
 ```C++
 class consensus_factory : public pipashan::paxos_factory_interface
@@ -76,7 +76,8 @@ private:
 //Assigns the factory with a given name "consensus"
 node.paxos_factory("consensus", std::make_shared<consensus_factory>());
 
-//Create the consensus instance with the specified name "consensus" and get the pointer cons
+//Create the consensus instance with the specified name "consensus" and the number of consensus
+//nodes is 3.
 auto cons = node.create_paxos("consensus", 3);
 ```
 The pipashan node can create multiple consensus instances, but it creates only one consensus instance for a given name.
