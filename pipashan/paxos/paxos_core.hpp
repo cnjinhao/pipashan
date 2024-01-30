@@ -245,7 +245,6 @@ namespace pipashan::paxos_details
 				return false;
 
 			// Agree the requester node as a paxos node.
-			
 			auto & node = _m_insert(conn->id());
 			node.conns.insert(conn);
 			node.status = node_status::registered;
@@ -758,10 +757,7 @@ namespace pipashan::paxos_details
 		}
 
 		void state(running_states s, bool elected)
-		{
-			auto me = nodecaps_->identity();
-			auto pax = paxos_;
-			
+		{	
 			if(running_states::ready == s && elected)
 			{
 				//This node is ready now by electing
@@ -1137,7 +1133,6 @@ namespace pipashan::paxos_details
 		/// This method is invoked by manager, unlike online_changed() and recv() which are invoked by the nodeconn
 		virtual void established(nodeconn::pointer conn) override
 		{
-			auto me = nodecaps_->identity();
 			/// Attaches the paxos instance if the remote is an acceptor of the paxos.
 			std::lock_guard lock{ mutex_ };
 

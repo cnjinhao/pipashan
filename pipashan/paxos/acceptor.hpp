@@ -700,8 +700,6 @@ namespace pipashan::paxos_details
 			conn->send(this, paxexs, [this, conn, tried_nodes](std::shared_ptr<buffer> buf, std::error_code err){
 				auto log = nodecaps_->log(paxos_, "paxos_exists");
 
-				auto me = nodecaps_->identity();
-
 				if((!err) && (buf->pkt()->api_key == proto::api::ack))
 				{
 					if((1 << 15) == buf->pkt()->len)
@@ -727,8 +725,6 @@ namespace pipashan::paxos_details
 						log.msg("This is the paxos(\"", paxos_, "\") node. Catchup now");
 
 						core_.enable_node_ready(conn->id(), "paxos_exists: this node and remote node are ready");
-
-						//std::this_thread::sleep_for(std::chrono::seconds{ 15 });
 
 						if(core_.state() != paxos_core::running_states::ready)
 						{
@@ -1052,7 +1048,7 @@ namespace pipashan::paxos_details
 				catcher_ptr = i->second;
 
 			bool completed = false;
-			auto cdata = catcher_ptr->catchup_data(paxcth, completed);
+			auto cdata = catcher_ptr->fetch_catchup_data(paxcth, completed);
 
 			using catchup_status = proto::payload::paxos_catchup_data_status;
 			proto::payload::paxos_catchup_data paxcth_data;

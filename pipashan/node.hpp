@@ -171,9 +171,6 @@ namespace pipashan
 			pipashan::log msg{"node", logio_};
 			msg.msg("This endpoint: ", endpt.addr);
 
-			//log::msg msg{"node"};
-			//msg<<"this endpoint: ipv4="<<endpt.addr.ipv4<<" ipv6="<<endpt.addr.ipv6<<" port="<<endpt.addr.port<<std::endl;
-
 			manager_.add_recv(&handler_);
 
 			std::error_code err;
@@ -560,7 +557,7 @@ namespace pipashan
 			}
 		}
 	private:
-		static bool _m_ifa_name_predicate(const char* name)
+		static bool _m_ifa_name_predicate(const char* name) noexcept
 		{
 #ifdef PIPASHAN_OS_APPLE
 			auto n = std::strlen(name);
@@ -803,7 +800,7 @@ namespace pipashan
 
 		/// Query status of the node
 		/**
-		 * ack status in read mode: 0 = ready; 1 = not ready; 2 = paxos not running; 3 = no paxos; 4 = deser error
+		 * Returns : 0 = ready; 1 = not ready; 2 = paxos not running; 3 = no paxos; 4 = deser error
 		 */
 		recv_status _m_paxos_ready(nodeconn::pointer conn, const std::shared_ptr<buffer>& buf)
 		{

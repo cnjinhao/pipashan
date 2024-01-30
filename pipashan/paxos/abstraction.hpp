@@ -1,6 +1,7 @@
 #ifndef PIPASHAN_PAXOS_ABSTRACTION_INCLUDED
 #define PIPASHAN_PAXOS_ABSTRACTION_INCLUDED
 
+#include <optional>
 #include "../net/server.hpp"
 
 namespace pipashan::paxos_details::abs

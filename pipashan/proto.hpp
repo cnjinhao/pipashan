@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <optional>
 #include "serialization.hpp"
 #include "identifier.hpp"
 

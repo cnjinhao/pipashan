@@ -36,7 +36,7 @@ namespace pipashan::paxos_details
 		 * @param completed Indicates snapshot and journal data are all returned
 		 * @return catchup data
 		 */
-		std::optional<catchup_data> catchup_data(const proto::payload::paxos_catchup& paxcth, bool& completed)
+		std::optional<catchup_data> fetch_catchup_data(const proto::payload::paxos_catchup& paxcth, bool& completed)
 		{
 			completed = false;
 			if(stages::begin == stage_)
