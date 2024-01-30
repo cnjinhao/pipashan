@@ -13,6 +13,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <errno.h>
 #endif
 
 namespace pipashan::paxos_details
@@ -29,8 +30,8 @@ namespace pipashan::paxos_details
 
 		fstream() = default;
 
-#ifdef PIPASHAN_OS_WINDOWS
 		fstream(std::filesystem::path p):
+#ifdef PIPASHAN_OS_WINDOWS
 			fd_(::CreateFileW(p.wstring().data(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, nullptr, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr)),
 			path_(std::move(p))
 		{
@@ -47,21 +48,36 @@ namespace pipashan::paxos_details
 			}
 		}
 #else
-		fstream(std::filesystem::path p):
 			fd_(::open(p.string().c_str(), O_RDWR | O_NONBLOCK | O_CREAT, mode)),
 			path_(std::move(p))
 		{
-			if(-1 != fd_)
+			if(-1 == fd_)
 			{
-				bytes_ = ::lseek(fd_, 0, SEEK_END);
-				::lseek(fd_, 0, SEEK_SET);
+				error_code_ = errno;
+				return;
 			}
+			
+			bytes_ = ::lseek(fd_, 0, SEEK_END);
+			::lseek(fd_, 0, SEEK_SET);
 		}
 #endif
 
 		~fstream()
 		{
 			close();
+		}
+
+		std::string error_message() const
+		{
+#ifdef PIPASHAN_OS_WINDOWS
+#else
+			switch(error_code_)
+			{
+			case 0:			return {};
+			case EACCES:	return "Permission denied";
+			}
+#endif
+			return "error code = " + std::to_string(error_code_);
 		}
 
 		void close()
@@ -94,7 +110,7 @@ namespace pipashan::paxos_details
 		}
 
 		/// 打开
-		void open(std::filesystem::path p)
+		bool open(std::filesystem::path p)
 		{
 			close();
 #ifdef PIPASHAN_OS_WINDOWS
@@ -117,6 +133,7 @@ namespace pipashan::paxos_details
 				bytes_ = static_cast<std::size_t>(li.QuadPart);
 				position_ = 0;
 				path_.swap(p);
+				return true;
 			}				
 
 #else			
@@ -127,8 +144,12 @@ namespace pipashan::paxos_details
 				::lseek(fd_, 0, SEEK_SET);
 				position_ = 0;
 				path_.swap(p);
+				return true;
 			}
+
+			error_code_ = errno;
 #endif
+			return false;
 		}
 
 		void clear()
@@ -282,6 +303,7 @@ namespace pipashan::paxos_details
 		std::filesystem::path path_;
 		file_size_t bytes_{ 0 };
 		file_size_t position_{ 0 };
+		int error_code_{ 0 };
 	};
 }
 

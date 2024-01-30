@@ -84,15 +84,15 @@ namespace pipashan::paxos_details
 			std::error_code err;
 			std::filesystem::create_directories(path, err);
 
-			fslog_.open(path / "queue");
-
-			if(!fslog_.is_open())
+			if(!fslog_.open(path / "queue"))
 			{
+				auto msg = "Failed to open task queue file of consensus(" + paxos_ + "):" + fslog_.error_message();
+
 				auto log = nodecaps->log("acceptor");
-				log.err("failed to create queue files for ", name, "\"");
+				log.err(msg);
 
 				fslog_.close();
-				return;
+				throw std::logic_error(msg);
 			}
 
 			metadata md;
